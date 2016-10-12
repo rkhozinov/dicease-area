@@ -1,0 +1,113 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3" type="text/javascript"></script>
+<!--<script src="static/js/googlemapsapi.js" type="text/javascript"></script>-->
+<!--<script src="static/js/googlemaps.js" type="text/javascript"></script>-->
+<script>
+var map;
+
+// Функция для получения абсолютных координат местоположения объекта по его имени
+function getLocation(geocoder, address, map){
+  geocoder.geocode({'address':address}, function(results,status){
+    if (status === google.maps.GeocoderStatus.OK){
+       map.setCenter(results[0].geometry.location);
+    }
+  });
+
+}
+// Функция инициализации карты
+function initialize(map) {
+  var location = new google.maps.LatLng(51.533333, 46);
+
+
+  // Включение блока кода только при наличии данных пользователя о городе
+  {% if city %}
+  var geocoder = new google.maps.Geocoder();
+
+  // Позиционирование карты на определенных коррдинатах, зависящих от данных пользователя
+  var map_options = {
+    center: getLocation(geocoder, "{{city}}", map),
+    zoom: 14
+  };
+
+  {% endif %}
+
+  // Включение блока кода при наличии данных, полученных на запрос пользователя
+  {% if monuments }
+    {% for monument in monuments %}
+
+       // Выставление маркера по адресу памятника
+       var marker = new google.maps.Marker({position: getLocation(geocoder, "{{ monument.fulladdress }}", map),
+                                            map: map});
+       // Добавление описания памятника для маркера
+       marker.addListener('click', function() {
+         new google.maps.InfoWindow({content: "{{ monuments.name }}"}).open(map, marker);
+       });
+
+    {% endfor %}
+  {% endif %}
+
+  map = new google.maps.Map(document.getElementById('map-container'), map_options);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+<div class="text-center">
+    <h1>Памятники культуры</h1>
+    {% if city %}
+    <h2>{{ city }}</h2>
+    {% endif %}
+</div>
+
+<br>
+
+<div class="container">
+    <form action="/" method="POST">
+        <div class="form-group">
+            <input name="city" class="form-control input-lg" type="text" placeholder="Введите название города">
+        </div>
+        <input type="submit" class="btn btn-primary btn-lg btn-block" value="Принять">
+    </form>
+</div>
+
+<br>
+
+{% if monuments %}
+<div class="container-fluid">
+    <div id="map-outer" class="col-md-12">
+        <div id="map-container" class="col-md-12"></div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="col-md-12">
+        <table class="table table-striped col-md-12">
+            <thead>
+            <tr>
+                <th>Описание памятника</th>
+                <th>Регион</th>
+                <th>Город</th>
+                <th>Адрес</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for monument in monuments %}
+            <tr>
+                <td>{{ monument.name }}</td>
+                <td>{{ monument.region }}</td>
+                <td>{{ monument.ato }}</td>
+                <td>{{ monument.address }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+
