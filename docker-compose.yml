@@ -2,12 +2,11 @@ version: '2'
 services:
   app:
     restart: always
-    build: ./app 
+    build: ./app
     expose:
       - "80"
     links:
       - postgres:postgres
-      - nginx
     volumes:
       - ./app:/usr/src/app/
     env_file: .env
@@ -15,7 +14,7 @@ services:
       - FLASK_DEBUG=1
       - DEBUG=1
     command: "/usr/local/bin/gunicorn --reload -w 1 -b :80 app:app"
-  
+
   nginx:
     build: ./nginx/
     ports:
@@ -26,7 +25,7 @@ services:
       - app
     links:
       - app:app
-  
+
   data:
     image: postgres:latest
     volumes:
