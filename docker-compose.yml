@@ -23,8 +23,6 @@ services:
       - /www/static
     volumes_from:
       - app
-    links:
-      - app:app
 
   data:
     image: postgres:latest
