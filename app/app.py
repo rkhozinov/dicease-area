@@ -1,54 +1,16 @@
 from config import BaseConfig
 from flask import Flask
 from flask import request, render_template
-from functools import wraps
-from SPARQLWrapper import SPARQLWrapper, JSON
-from logging import DEBUG
 
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
-app.config['DEBUG'] = True
-app.logger.setLevel(DEBUG)
+db = SQLAlchemy(app)
+console = logging.StreamHandler()
+log = logging.getLogger("app")
+log.addHandler(console)
+log.setLevel(logging.DEBUG)
 
-sparql_query_tpl = """
-prefix map: <{base_uri}:{port}/resource/vocab/monuments_>
-select ?name ?region ?ato ?address
-where {{
-filter isLiteral(?name && ?region && ?ato && ?address)
-
-?monument map:address        ?address       ;
-          map:ansid          ?ansid         ;
-          map:ato            ?ato           ;
-          map:condition      ?condition     ;
-          map:dating         ?dating        ;
-          map:id             ?id            ;
-          map:monprotaction  ?monprotaction ;
-          map:montype        ?montype       ;
-          map:name           ?name          ;
-          map:protactiondoc  ?protactiondoc ;
-          map:region         ?region        .
-
-}} limit {sparql_limit}"""
-
-endpoint = 'http://rdfserver:{rdfserver_port}/sparql'.format(
-    rdfserver_port=BaseConfig.RDFSERVER_PORT)
-
-sparql = SPARQLWrapper(endpoint)
-sparql_query = sparql_query_tpl.format(base_uri=BaseConfig.RDFSERVER_BASE_URI,
-                                       port=BaseConfig.RDFSERVER_PORT,
-                                       sparql_limit=BaseConfig.SPARQL_LIMIT)
-sparql.setQuery(sparql_query)
-sparql.setReturnFormat(JSON)
-
-class Monument(object):
-    def __init__(self, name, region, ato, address):
-        self.name = name['value']
-        self.region = region['value']
-        self.ato = ato['value']
-        self.address = address['value']
-        self.fullladdress = ", ".join((self.region, self.ato, self.address))
-
-
+from models import *
 def templated(template=None):
     def decorator(f):
         @wraps(f)
@@ -67,11 +29,6 @@ def templated(template=None):
         return decorated_function
 
     return decorator
-
-
-def log(msg, level=DEBUG):
-    app.logger.log(level, msg)
-
 
 @app.route('/', methods=['GET', 'POST'])
 @templated('index.html')

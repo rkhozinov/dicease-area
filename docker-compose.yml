@@ -1,41 +1,37 @@
-version: '2'
-services:
-  app:
-    restart: always
-    build: ./app
-    expose:
-      - "80"
-    links:
-      - postgres:postgres
-    volumes:
-      - ./app:/usr/src/app/
-    env_file: .env
-    environment:
-      - FLASK_DEBUG=1
-      - DEBUG=1
-    command: "/usr/local/bin/gunicorn --reload -w 1 -b :80 app:app"
+web:
+  restart: always
+  build: ./web
+  expose:
+    - "8000"
+# links:
+#   - postgres:postgres
+  volumes:
+    - ./web:/usr/src/app/
+  env_file: .env
+  command: /usr/local/bin/gunicorn --reload --log-level info -w 1 -b :8000 app:app
 
-  nginx:
-    build: ./nginx/
-    ports:
-      - "8080:8080"
-    volumes:
-      - /www/static
-    volumes_from:
-      - app
-    links:
-      - app:app
+nginx:
+  restart: always
+  build: ./nginx/
+  ports:
+    - "80:80"
+  volumes:
+    - /www/static
+  volumes_from:
+    - web
+  links:
+    - web:web
 
-  data:
-    image: postgres:latest
-    volumes:
-      - /var/lib/postgresql
-      - ./dbdata:/var/lib/postgresql/dbdata
-    command: "true"
-
-  postgres:
-    image: postgres:latest
-    volumes_from:
-      - data
-    ports:
-      - "5432:5432"
+#data:
+#  image: postgres:latest
+#  volumes:
+#    - /var/lib/postgresql
+#  command: "true"
+#
+#postgres:
+#  restart: always
+#  image: postgres:latest
+#  volumes_from:
+#    - data
+#  ports:
+#    - "5432:5432"
