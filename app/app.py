@@ -1,6 +1,8 @@
 from config import BaseConfig
+import logging
 from flask import Flask
 from flask import request, render_template
+from functools import wraps
 
 app = Flask(__name__)
 app.config.from_object(BaseConfig)
@@ -33,16 +35,9 @@ def templated(template=None):
 @app.route('/', methods=['GET', 'POST'])
 @templated('index.html')
 def index():
-    monuments = []
-    city = request.form.get('city', None)
-    if city:
-        results = sparql.query().convert()
 
-        monuments = [Monument(**result)
-                     for result in results["results"]["bindings"]
-                     if city in result['ato']['value']
-                     ]
-
+    city="city"
+    monuments=[]
     return dict(city=city, monuments=monuments)
 
 

@@ -3,8 +3,6 @@ web:
   build: ./web
   expose:
     - "8000"
-# links:
-#   - postgres:postgres
   volumes:
     - ./web:/usr/src/app/
   env_file: .env
@@ -21,17 +19,3 @@ nginx:
     - web
   links:
     - web:web
-
-#data:
-#  image: postgres:latest
-#  volumes:
-#    - /var/lib/postgresql
-#  command: "true"
-#
-#postgres:
-#  restart: always
-#  image: postgres:latest
-#  volumes_from:
-#    - data
-#  ports:
-#    - "5432:5432"
