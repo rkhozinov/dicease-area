@@ -1,4 +1,4 @@
-from flask import Flask 
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -13,9 +13,9 @@ class Hospital(db.Model):
     address = db.Column(db.String(120), unique=True)
     coordinates = db.Column(db.String(120), unique=True, nullable=True)
     district_id = db.Column(db.Integer, db.ForeignKey('district.id'))
-    district = db.relationship('District', 
+    district = db.relationship('District',
             backref=db.backref('hospitals',lazy='dynamic'))
-    
+
     def __init__(self, name, address, district, coordinates=None):
         self.name = name
         self.address = address
