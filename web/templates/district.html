@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+{% include "_navigation.html" %}
+<!--<div class="text-center">-->
+<!--<h1>Add a district</h1>-->
+<!--</div>-->
+
+<br>
+
+<div class="text-center">
+    <form class="form" action="/district" method="POST">
+        <div class="form-group">
+            <input name="name" class="form-control input-lg" type="text" placeholder="Enter a district name" required>
+        </div>
+        <div class="form-group">
+            <input name="coordinates" class="form-control input-lg" type="text"
+                   placeholder="Enter district coordinates (ex. 89.0; 93.35)">
+        </div>
+        <input type="submit" class="btn btn-success btn-lg btn-circle" value="+">
+    </form>
+</div>
+<br>
+
+{% for district in districts %}
+<form action="/district/delete" method="POST">
+    <div class="form-group">
+        <div class="well well-sm">
+            <input type="submit" class="btn btn-danger btn-circle" value="-"> <strong>{{district.name}}</strong>
+            <input type="hidden" name="district_id" value="{{district.id}}">
+        </div>
+    </div>
+</form>
+{% endfor %}
+{% endblock %}
