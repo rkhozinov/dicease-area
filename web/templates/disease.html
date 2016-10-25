@@ -1,0 +1,33 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+{% include "_navigation.html" %}
+<!--<div class="text-center">-->
+<!--<h1>Add a disease</h1>-->
+<!--</div>-->
+
+<br>
+
+<div class="text-center">
+    <form class="form" action="/disease" method="POST">
+        <div class="form-group">
+            <input name="name" class="form-control input-lg" type="text" placeholder="Enter a disease name"
+                   required>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" class="btn btn-success btn-lg btn-circle" value="+">
+        </div>
+    </form>
+</div>
+{% if hospitals %} <hr/> {% endif %}
+{% for disease in diseases %}
+<form action="/disease/delete" method="POST">
+    <div class="well well-sm">
+        <input type="submit" class="btn-danger btn btn-circle" value="-"><strong> {{disease.name}}</strong>
+        <input type="hidden" name="disease_id" value="{{disease.id}}">
+    </div>
+</form>
+{% endfor %}
+{% endblock %}

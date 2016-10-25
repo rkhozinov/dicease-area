@@ -1,0 +1,10 @@
+{% set active_page = request.path %}
+<ul class="nav nav-pills">
+{% for nav in navigation %}
+    <li role="presentation" {%- if active_page==url_for(nav) %} class="active" {% endif %}>
+        <a href="{{url_for(nav)}}">{{nav|capitalize}}</a>
+    </li>
+{% endfor %}
+</ul>
+
+
