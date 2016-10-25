@@ -1,25 +1,21 @@
-## Dockerizing Flask With Compose and Machine - From Localhost to the Cloud
+## Dockerizing Flask With Compose and Machine
+
+Disease-area is a tool to show hospitals and disease area of poplutation on a map
 
 Featuring:
 
-- Docker v1.10.3, build d12ea79c9de6d144ce6bc7ccfe41c507cca6fd35
-- Docker Compose v1.6.2
-- Docker Machine v0.6.0
-
-
-**Check out the awesome blog post here > https://realpython.com/blog/python/dockerizing-flask-with-compose-and-machine-from-localhost-to-the-cloud/**
+- Docker v1.12.2
+- Docker Compose 1.7.1, build 6c29830 
+- Docker Machine v0.8.1 
 
 ## How to run
 
 
 ```
-#!bash
 docker compose up -d
 ```
+
 ```
-#!bash
-<vm_ip>:80 - d2rq-mapper
+<vm_ip>:80 - ngingx 
 <vm_ip>:8080 - application
-<vm_ip>:2021 - sparql endpoint
-<vm_ip>:5432 - postgresql database
 ```
