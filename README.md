@@ -10,12 +10,13 @@ Featuring:
 
 ## How to run
 
-
+SQLite is used during developing.
+If the db isn't exist - flask-sqlaclhemy initializes it automatically from the model.
 ```
 docker compose up -d
 ```
 
 ```
-<vm_ip>:80 - ngingx 
+<vm_ip>:80 - nginx 
 <vm_ip>:8080 - application
 ```
