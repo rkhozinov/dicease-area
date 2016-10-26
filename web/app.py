@@ -1,4 +1,3 @@
-# app.py
 from sys import path
 from os.path import dirname as dir
 
@@ -8,9 +7,8 @@ import logging
 
 from config import Config
 from flask import Flask
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-import requests
 
 app = Flask(__name__)
 
@@ -143,8 +141,8 @@ def _get_all_hospitals():
     return Hospital.query.order_by(Hospital.name).all()
 
 
-def _get_coordinates(place):
-    pass
+def _get_district_by_id(district_id):
+    return District.query.filter_by(id=district_id).first() if district_id else None
 
 
 if __name__ == '__main__':

@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+{% include "_navigation.html" %}
+
+<!--<div class="text-center">-->
+<!--<h1>Add a hospital</h1>-->
+<!--</div>-->
+
+<br>
+
+<div class="text-center">
+    <form class="form" action="/hospital" method="POST">
+        <div class="form-group">
+            <input name="name" class="form-control input-lg" type="text" placeholder="Enter a hospital name"
+                   required>
+        </div>
+        <div class="form-group">
+            <input name="address" class="form-control input-lg" type="text" placeholder="Enter a hospital address">
+        </div>
+        <div class="form-group">
+            <input name="phone" class="form-control input-lg" type="text" placeholder="Enter a hospital phone">
+        </div>
+        <div class="form-group">
+            <input name="coordinates" class="form-control input-lg" type="text"
+                   placeholder="Enter coordinates (ex. 89.0; 93.35)">
+        </div>
+        <div class="form-group">
+            <label for="district_id">Select a district:</label>
+            <select class="form-control input-lg" name="district_id" id="district_id">
+                {% for district in districts %}
+                <option value="{{district.id}}">{{district.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-success btn-lg btn-circle" value="+">
+        </div>
+    </form>
+</div>
+{% if hospitals %} <hr/> {% endif %}
+{% for hospital in hospitals %}
+<form action="/hospital/delete" method="POST">
+    <div class="form-group">
+        <div class="well well-sm">
+
+            <input type="submit" class="btn btn-danger btn-circle" value="-"><strong> {{hospital.name}} - {{hospital.district}}</strong>
+            <input type="hidden" name="hospital_id" value="{{hospital.id}}">
+        </div>
+    </div>
+</form>
+{% endfor %}
+{% endblock %}
