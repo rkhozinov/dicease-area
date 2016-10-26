@@ -11,7 +11,7 @@ Featuring:
 ## How to run
 
 SQLite is used during developing.
-If the db isn't exist - flask-sqlaclhemy initializes it automatically from the model.
+If the db isn't exist - flask-sqlalchemy initializes it automatically from the model.
 ```
 docker compose up -d
 ```
