@@ -1,54 +1,34 @@
 {% extends "_base.html" %}
-
 {% block content %}
-
 {% include "_navigation.html" %}
-
-<!--<div class="text-center">-->
-<!--<h1>Add a hospital</h1>-->
-<!--</div>-->
-
-<br>
+{% from "_macro.html" import text_input with context %}
+{% from "_macro.html" import submit with context %}
+{% from "_macro.html" import select with context %}
 
 <div class="text-center">
-    <form class="form" action="/hospital" method="POST">
-        <div class="form-group">
-            <input name="name" class="form-control input-lg" type="text" placeholder="Enter a hospital name"
-                   required>
-        </div>
-        <div class="form-group">
-            <input name="address" class="form-control input-lg" type="text" placeholder="Enter a hospital address">
-        </div>
-        <div class="form-group">
-            <input name="phone" class="form-control input-lg" type="text" placeholder="Enter a hospital phone">
-        </div>
-        <div class="form-group">
-            <input name="coordinates" class="form-control input-lg" type="text"
-                   placeholder="Enter coordinates (ex. 89.0; 93.35)">
-        </div>
-        <div class="form-group">
-            <label for="district_id">Select a district:</label>
-            <select class="form-control input-lg" name="district_id" id="district_id">
-                {% for district in districts %}
-                <option value="{{district.id}}">{{district.name}}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <input type="submit" class="btn btn-success btn-lg btn-circle" value="+">
-        </div>
+    <form class="form" action="/population" method="POST">
+        {{ text_input('year','Enter a year', True) }}
+        {{ text_input('women','Enter amount of women') }}
+        {{ text_input('men','Enter amount of men') }}
+        {{ text_input('children','Enter amount of children') }}
+        {{ text_input('employable_men','Enter amount of employable men') }}
+        {{ text_input('employable_women','Enter amount of employable women') }}
+        {{ select('district') }}
+        {{ submit('add') }}
     </form>
 </div>
-{% if hospitals %} <hr/> {% endif %}
-{% for hospital in hospitals %}
-<form action="/hospital/delete" method="POST">
+
+{% if populations %} <hr/> {% endif %}
+
+{% for population in populations %}
+<form action="/population/delete" method="POST">
     <div class="form-group">
         <div class="well well-sm">
-
-            <input type="submit" class="btn btn-danger btn-circle" value="-"><strong> {{hospital.name}} - {{hospital.district}}</strong>
-            <input type="hidden" name="hospital_id" value="{{hospital.id}}">
+            {{ submit('delete') }} <strong> {{population.year}} </strong> - {{population.district}} all: {{population.all}} adults:{{population.adults}} children:{{population.children}}
+            <input type="hidden" name="population_id" value="{{population.id}}">
         </div>
     </div>
 </form>
 {% endfor %}
 {% endblock %}
+
