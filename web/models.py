@@ -88,8 +88,10 @@ class Population(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer)
     all = db.Column(db.Integer)
-    adults = db.Column(db.Integer)
+    men = db.Column(db.Integer)
+    women = db.Column(db.Integer)
     children = db.Column(db.Integer)
+    adults = db.Column(db.Integer)
     employable = db.Column(db.Integer)
     employable_men = db.Column(db.Integer)
     employable_women = db.Column(db.Integer)
@@ -99,17 +101,18 @@ class Population(db.Model):
                                backref=db.backref('population', lazy='dynamic', uselist=True))
 
     def __init__(self, year, district,
-                 men=0, women=0, children=0, employable_men=0, employable_women=0):
+                 men=0, women=0, children=0, employable_men=0, employable_women=0, district_id=0):
         self.district = district
         self.year = int(year)
         self.men = int(men)
         self.women = int(women)
-        self.all = self.men + self.women
         self.children = int(children)
         self.employable_men = int(employable_men)
         self.employable_women = int(employable_women)
-        self.adults = int(self.all - self.children)
-        self.employable = int(self.employable_men + self.employable_women)
+
+        self.all = self.men + self.women
+        self.adults = self.all - self.children
+        self.employable = self.employable_men + self.employable_women
 
     def __repr__(self):
         return '{}:{}'.format(self.year, self.all)
