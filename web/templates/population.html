@@ -1,0 +1,34 @@
+{% extends "_base.html" %}
+{% block content %}
+{% include "_navigation.html" %}
+{% from "_macro.html" import text_input with context %}
+{% from "_macro.html" import submit with context %}
+{% from "_macro.html" import select with context %}
+
+<div class="text-center">
+    <form class="form" action="/population" method="POST">
+        {{ text_input('year','Enter a year', True) }}
+        {{ text_input('women','Enter amount of women') }}
+        {{ text_input('men','Enter amount of men') }}
+        {{ text_input('children','Enter amount of children') }}
+        {{ text_input('employable_men','Enter amount of employable men') }}
+        {{ text_input('employable_women','Enter amount of employable women') }}
+        {{ select('district') }}
+        {{ submit('add') }}
+    </form>
+</div>
+
+{% if populations %} <hr/> {% endif %}
+
+{% for population in populations %}
+<form action="/population/delete" method="POST">
+    <div class="form-group">
+        <div class="well well-sm">
+            {{ submit('delete') }} <strong> {{population.year}} </strong> - {{population.district}} all: {{population.all}} adults:{{population.adults}} children:{{population.children}}
+            <input type="hidden" name="population_id" value="{{population.id}}">
+        </div>
+    </div>
+</form>
+{% endfor %}
+{% endblock %}
+

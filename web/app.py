@@ -1,4 +1,3 @@
-# app.py
 from sys import path
 from os.path import dirname as dir
 
@@ -8,9 +7,8 @@ import logging
 
 from config import Config
 from flask import Flask
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-import requests
 
 app = Flask(__name__)
 
@@ -29,7 +27,7 @@ log = logging.getLogger("app")
 log.addHandler(console)
 log.setLevel(logging.DEBUG)
 
-navigation = ['district', 'hospital', 'disease']
+navigation = ['district','population', 'hospital', 'disease' ]
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -63,7 +61,7 @@ def district_delete():
 
         log.debug(district)
 
-        if district and not district.hospitals.count():
+        if district and not district.hospitals.count() and not district.population.count():
             db.session.delete(district)
             db.session.commit()
 
@@ -131,6 +129,52 @@ def hospital_delete():
     return redirect(url_for('hospital'))
 
 
+@app.route('/population', methods=['GET', 'POST'])
+def population():
+    if request.method == 'POST':
+        log.debug(request.form)
+        year = request.form.get('year')
+        men = request.form.get('men')
+        women = request.form.get('women')
+        children = request.form.get('children')
+        employable_men = request.form.get('employable_men')
+        employable_women = request.form.get('employable_women')
+        district_id = request.form.get('district_id')
+        district = _get_district_by_id(district_id)
+        if year and district:
+            db.session.add(Population(district=district,
+                                      year=year,
+                                      men=men,
+                                      women=women,
+                                      children=children,
+                                      employable_men=employable_men,
+                                      employable_women=employable_women
+                                      )
+                           )
+            db.session.commit()
+
+    return render_template('population.html', populations=_get_all_population(),
+                           districts=_get_all_districts(),
+                           navigation=navigation)
+
+
+@app.route('/population/delete', methods=['POST'])
+def population_delete():
+    if request.method == 'POST':
+        population_id = int(request.form.get('population_id'))
+        log.debug(request.form)
+        population = Population.query.filter_by(id=population_id).first()
+        if population:
+            db.session.delete(population)
+            db.session.commit()
+
+    return redirect(url_for('population'))
+
+
+def _get_all_population():
+    return Population.query.order_by(Population.year).all()
+
+
 def _get_all_districts():
     return District.query.order_by(District.name).all()
 
@@ -143,8 +187,8 @@ def _get_all_hospitals():
     return Hospital.query.order_by(Hospital.name).all()
 
 
-def _get_coordinates(place):
-    pass
+def _get_district_by_id(district_id):
+    return District.query.filter_by(id=district_id).first() if district_id else None
 
 
 if __name__ == '__main__':
