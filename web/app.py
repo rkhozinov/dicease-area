@@ -27,7 +27,8 @@ log = logging.getLogger("app")
 log.addHandler(console)
 log.setLevel(logging.DEBUG)
 
-navigation = ['district','population', 'hospital', 'disease' ]
+navigation = ['district', 'population', 'hospital', 'disease',
+              'disease population']
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -61,7 +62,8 @@ def district_delete():
 
         log.debug(district)
 
-        if district and not district.hospitals.count() and not district.population.count():
+        if district and not district.hospitals.count() \
+                and not district.population.count():
             db.session.delete(district)
             db.session.commit()
 
@@ -87,7 +89,7 @@ def disease_delete():
         log.debug(request.form)
         disease = Disease.query.filter_by(id=disease_id).first()
 
-        if disease:
+        if disease and not disease.population.count():
             db.session.delete(disease)
             db.session.commit()
 
@@ -104,7 +106,8 @@ def hospital():
         coordinates = request.form.get('coordinates')
         district_id = request.form.get('district_id')
 
-        district = District.query.filter_by(id=district_id).first() if district_id else None
+        district = District.query.filter_by(id=district_id).first() \
+            if district_id else None
 
         if name and district:
             db.session.add(Hospital(name=name, address=address, phone=phone,
@@ -122,7 +125,8 @@ def hospital_delete():
         hospital_id = int(request.form.get('hospital_id'))
         log.debug(request.form)
         hospital = Hospital.query.filter_by(id=hospital_id).first()
-        if hospital:
+
+        if hospital and not hospital.population.count():
             db.session.delete(hospital)
             db.session.commit()
 
@@ -171,6 +175,55 @@ def population_delete():
     return redirect(url_for('population'))
 
 
+@app.route('/disease_population', methods=['GET', 'POST'])
+def disease_population():
+    if request.method == 'POST':
+        log.debug(request.form)
+
+        year = request.form.get('year')
+        children = request.form.get('children')
+        children_observed = request.form.get('children_observed')
+        adults = request.form.get('adults')
+        adults_observed = request.form.get('adults_observed')
+        hospital_id = request.form.get('hospital_id')
+        disease_id = request.form.get('disease_id')
+
+        disease = _get_disease_by_id(disease_id)
+        hospital = _get_hospital_by_id(hospital_id)
+
+        if year and disease and hospital:
+            db.session.add(DiseasePopulation(year=year,
+                                             children=children,
+                                             children_observed=children_observed,
+                                             adults=adults,
+                                             adults_observed=adults_observed,
+                                             hospital=hospital,
+                                             disease=disease,
+                                             )
+                           )
+            db.session.commit()
+
+    return render_template('disease_population.html',
+                           disease_populations=_get_all_disease_population(),
+                           diseases=_get_all_diseases(),
+                           hospitals=_get_all_hospitals(),
+                           navigation=navigation)
+
+
+@app.route('/disease_population/delete', methods=['POST'])
+def disease_population_delete():
+    if request.method == 'POST':
+        log.debug(request.form)
+        disease_population_id = request.form.get('disease_population_id')
+        disease_population = DiseasePopulation.query.filter_by(
+            id=disease_population_id).first()
+        if disease_population:
+            db.session.delete(disease_population)
+            db.session.commit()
+
+    return redirect(url_for('disease_population'))
+
+
 def _get_all_population():
     return Population.query.order_by(Population.year).all()
 
@@ -179,16 +232,31 @@ def _get_all_districts():
     return District.query.order_by(District.name).all()
 
 
-def _get_all_diseases():
-    return Disease.query.order_by(Disease.name).all()
-
-
 def _get_all_hospitals():
     return Hospital.query.order_by(Hospital.name).all()
 
 
+def _get_all_diseases():
+    return Disease.query.order_by(Disease.name).all()
+
+
+def _get_all_disease_population():
+    return DiseasePopulation.query.order_by(DiseasePopulation.year).all()
+
+
 def _get_district_by_id(district_id):
-    return District.query.filter_by(id=district_id).first() if district_id else None
+    return District.query.filter_by(
+        id=district_id).first() if district_id else None
+
+
+def _get_disease_by_id(disease_id):
+    return Disease.query.filter_by(
+        id=disease_id).first() if disease_id else None
+
+
+def _get_hospital_by_id(hospital_id):
+    return Hospital.query.filter_by(
+        id=hospital_id).first() if hospital_id else None
 
 
 if __name__ == '__main__':

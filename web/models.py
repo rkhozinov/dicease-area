@@ -46,9 +46,9 @@ class Disease(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, unique=True)
 
-    def __init__(self, name, desciption=None):
+    def __init__(self, name, description=None):
         self.name = name
-        self.description = desciption
+        self.description = description
 
 
 class DiseasePopulation(db.Model):
@@ -61,27 +61,31 @@ class DiseasePopulation(db.Model):
     adults_observed = db.Column(db.Integer, nullable=True)
 
     hospital_id = db.Column(db.Integer, db.ForeignKey('hospital.id'))
-    hospitals = db.relationship('Hospital',
-                                backref=db.backref('diseases', lazy='dynamic', uselist=True))
+    hospital = db.relationship('Hospital',
+                                backref=db.backref('population', lazy='dynamic',
+                                                   uselist=True))
 
     disease_id = db.Column(db.Integer, db.ForeignKey('disease.id'))
     disease = db.relationship('Disease',
                               backref=db.backref('population', lazy='dynamic', uselist=True))
 
-    def __init__(self, disease, hospitals, year, adults=0, adults_observed=0,
+
+
+    def __init__(self, disease, hospital, year, adults=0, adults_observed=0,
                  children=0, children_observed=0):
         self.disease = disease
-        self.hospitals = hospitals
+        self.hospital = hospital
         self.year = int(year) if year else 0
         self.children = int(children)
         self.children_observed = int(children_observed)
         self.adults = int(adults)
         self.adults_observed = int(adults_observed)
         self.all = self.children + self.adults
-        self.all_observer = self.children_observed + self.adults_observed
+        self.all_observed = self.children_observed + self.adults_observed
 
     def __repr__(self):
         return '{0}{1}'.format(self.name, self.year)
+
 
 
 class Population(db.Model):
