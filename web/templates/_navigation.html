@@ -1,8 +1,9 @@
 {% set active_page = request.path %}
 <ul class="nav nav-pills text-center">
 {% for nav in navigation %}
-    <li role="presentation" {%- if active_page==url_for(nav) %} class="active" {% endif %}>
-        <a href="{{url_for(nav)}}">{{nav|capitalize}}</a>
+    {% set url = url_for(nav|replace(' ','_')) %}
+    <li role="presentation" {%- if active_page==url%} class="active" {% endif %}>
+        <a href="{{url}}">{{nav|capitalize}}</a>
     </li>
 {% endfor %}
 </ul>

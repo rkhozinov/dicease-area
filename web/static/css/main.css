@@ -1,8 +1,20 @@
 /* custom styles */
 
 .container {
-  max-width: 500px;
+  max-width: 80%;
 }
+
+.container .input-container {
+  max-width: 550px;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-fluid .data-container {
+  max-width: 50%;
+}
+
 
 body{margin:40px;}
 
