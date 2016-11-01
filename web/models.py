@@ -10,7 +10,7 @@ from app import db
 class District(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True)
-    coordinates = db.Column(db.String(120), nullable=True)
+    coordinates = db.Column(db.Text, nullable=True)
 
     def __init__(self, name, coordinates=None):
         self.name = name
@@ -25,7 +25,7 @@ class Hospital(db.Model):
     name = db.Column(db.String(120), unique=True)
     address = db.Column(db.String(120), nullable=True)
     phone = db.Column(db.String(120), nullable=True)
-    coordinates = db.Column(db.String(120), nullable=True)
+    coordinates = db.Column(db.Text, nullable=True)
 
     district_id = db.Column(db.Integer, db.ForeignKey('district.id'))
     district = db.relationship('District',
@@ -62,14 +62,12 @@ class DiseasePopulation(db.Model):
 
     hospital_id = db.Column(db.Integer, db.ForeignKey('hospital.id'))
     hospital = db.relationship('Hospital',
-                                backref=db.backref('population', lazy='dynamic',
-                                                   uselist=True))
+                               backref=db.backref('population', lazy='dynamic',
+                                                  uselist=True))
 
     disease_id = db.Column(db.Integer, db.ForeignKey('disease.id'))
     disease = db.relationship('Disease',
                               backref=db.backref('population', lazy='dynamic', uselist=True))
-
-
 
     def __init__(self, disease, hospital, year, adults=0, adults_observed=0,
                  children=0, children_observed=0):
@@ -85,7 +83,6 @@ class DiseasePopulation(db.Model):
 
     def __repr__(self):
         return '{0}{1}'.format(self.name, self.year)
-
 
 
 class Population(db.Model):

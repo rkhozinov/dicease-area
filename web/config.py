@@ -1,5 +1,6 @@
 import os
 
+
 class Config(object):
     SECRET_KEY = os.environ['SECRET_KEY']
     CSRF_ENABLED = True
@@ -9,6 +10,6 @@ class Config(object):
     DB_PASS = os.environ['DB_PASS']
     DB_SERVICE = os.environ['DB_SERVICE']
     DB_PORT = os.environ['DB_PORT']
+    GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-

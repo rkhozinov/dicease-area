@@ -9,6 +9,7 @@ from config import Config
 from flask import Flask
 from flask import request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from googlemaps import client
 
 app = Flask(__name__)
 
@@ -21,6 +22,8 @@ from models import *
 
 with app.test_request_context():
     db.create_all()
+
+gmaps = client.Client(key=Config.GOOGLE_MAPS_KEY)
 
 console = logging.StreamHandler()
 log = logging.getLogger("app")
@@ -41,11 +44,11 @@ def district():
     if request.method == 'POST':
         log.debug(request.form)
         name = request.form.get('name')
-        coordinates = request.form.get('coordinates')
 
+        # TODO: update coordinates for district
         district = District.query.filter_by(name=name).first()
         if name and not district:
-            db.session.add(District(name=name, coordinates=coordinates))
+            db.session.add(District(name=name, coordinates=_get_coordignates(name)))
             db.session.commit()
         return redirect(url_for('district'))
 
@@ -103,7 +106,6 @@ def hospital():
         name = request.form.get('name')
         address = request.form.get('address')
         phone = request.form.get('phone')
-        coordinates = request.form.get('coordinates')
         district_id = request.form.get('district_id')
 
         district = District.query.filter_by(id=district_id).first() \
@@ -111,7 +113,7 @@ def hospital():
 
         if name and district:
             db.session.add(Hospital(name=name, address=address, phone=phone,
-                                    coordinates=coordinates, district=district))
+                                    coordinates=_get_coordignates(name), district=district))
             db.session.commit()
 
     return render_template('hospital.html', hospitals=_get_all_hospitals(),
@@ -257,6 +259,11 @@ def _get_disease_by_id(disease_id):
 def _get_hospital_by_id(hospital_id):
     return Hospital.query.filter_by(
         id=hospital_id).first() if hospital_id else None
+
+
+def _get_coordignates(name):
+    geodata = gmaps.geocode(address=name, language='RU')
+    return str(geodata[0]) if len(geodata) > 0 else None
 
 
 if __name__ == '__main__':
